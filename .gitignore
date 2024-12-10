@@ -4,3 +4,8 @@
 build
 .vscode
 test/stress.error
+.DS_Store
+docs/.DS_Store
+src/.DS_Store
+test/.DS_Store
+test/test_cases/.DS_Store
