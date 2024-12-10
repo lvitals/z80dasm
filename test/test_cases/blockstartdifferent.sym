@@ -1,0 +1,2 @@
+; block0_start is also automatically generated from the block file.
+block0_start:	equ 0x0001

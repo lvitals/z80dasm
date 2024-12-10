@@ -1,0 +1,5 @@
+; comment
+
+test_code:	start 0x0000 end 0x0008 type code
+test_pointers:	start 0x0002 end 0x0006 type pointers
+test_bytedata:	start 0x0008 end 0x000a type bytedata

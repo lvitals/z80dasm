@@ -1,0 +1,1 @@
+-S test_cases/blockstartdifferent.sym -b test_cases/blockstartdifferent.blocks

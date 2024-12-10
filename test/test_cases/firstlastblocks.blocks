@@ -1,0 +1,2 @@
+test_bytedata:	first 0x0002 last 0x0005 type bytedata
+test_pointers:	first 0x0006 last 0x0009 type pointers

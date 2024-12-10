@@ -1,0 +1,13 @@
+; comments separated with a blank line are ignored.
+
+; this example calls the wait_342ms subroutine;
+; then it halts!
+start:                      equ 0x0000
+
+;
+; wait 342 milliseconds
+; this needs a Z80 running at 2.5Mhz to work!
+wait_342ms:                 equ 0x0004
+
+; inner loop
+wait_342ms_inner:           equ 0x0008

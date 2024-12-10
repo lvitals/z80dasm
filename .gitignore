@@ -1,0 +1,6 @@
+*.o
+.deps
+.vscode
+build
+.vscode
+test/stress.error

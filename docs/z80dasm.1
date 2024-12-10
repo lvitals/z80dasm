@@ -1,0 +1,166 @@
+.TH Z80DASM 1 2007-06-14 "Tomaz Solc" "Z80 disassembler User's manual"
+.SH NAME
+z80dasm \- Z80 assembly generating disassembler
+.SH SYNOPSIS
+.B z80dasm
+[
+.I options
+]
+.I file
+.SH DESCRIPTION
+.B z80dasm
+disassembles a binary file containing Z80 machine code into Z80 assembly language source (including a number of undocumented opcodes). It can try to guess locations of labels in the code or the labels can be specified by hand in the form of a symbol file. If given proper information the disassembler can also split the binary file into code and data sections of several different types.
+.P
+Generated source file can be assembled back into the original binary using z80asm, zasm or the original Zilog assembler (when the 
+.B \-\-zilog
+option was used).
+.SH OPTIONS
+.TP
+.B \-a, \-\-address
+Print the address of the memory location corresponding to each line of assembly code in a comment at the end of the line. 
+.TP
+.B \-b, \-\-block-def=FILE
+Read block information from a file. If this option is not specified the default is for the entire file to contain machine code. See
+.B BLOCK FILE
+below.
+.TP
+.B \-g, \-\-origin=ORG
+Specify the start address of the binary code being disassembled. A corresponding 
+.I org
+directive is generated in the output file.  The argument is read in hexadecimal if  it  begins with 0x or 0X, in octal if it begins with 0, and in base 10 otherwise. Default is 0x0100. 
+.TP
+.B \-h, \-\-help
+Show summary of options and exit.
+.TP
+.B \-l, \-\-labels
+Try to guess label locations from jump instructions and add them to the assembly code.
+.TP
+.B "\-o, \-\-output=FILE
+Specify the output file. Default is to write to standard output.
+.TP
+.B \-c, \-\-sym-comments
+Transfer comments from the symbol file to the output.
+.TP
+.B \-r, \-\-sym-order=SORT
+Ordering of symbols in the symbol file. SORT can be 
+.I default
+(sort by value) or
+.I frequency
+(sort by usage frequency).
+.TP
+.B \-s, \-\-sym-output=FILE
+Write symbol information into a file.
+.TP
+.B \-S, \-\-sym-input=FILE
+Read symbol information from a file. See 
+.B SYMBOL FILE 
+below.
+.TP
+.B \-t, \-\-source
+Print the binary data corresponding to each line of assembly code in a comment at the end of the line. Data is printed in hex and ASCII. This is useful for identifying data sections in the first disassembly.
+.TP
+.B \-\-tab\-stops=S1,S2,S3,S4,S5
+Set tab stops to use when aligning output into columns. Use this option to set wider or narrower columns in the disassembly. This is useful for example to get a pretty output when using long symbol names. Disassembly is aligned into up to 5 columns (depending on other options): labels, instructions, memory address, hex source, ASCII source. Default is 0,1,4,5,7.
+.TP
+.B \-\-tab\-width=N
+The tab width in characters to use when aligning output into columns. Set this to the same tab width as you use in your terminal or text editor to get the disassembly to align nicely into vertical columns. Default is 8.
+.TP
+.B \-u, \-\-undoc
+By default, all undocumented instructions are disassembled as
+.I defb
+directives with the instruction name in a comment. This is due to missing or buggy support for many of these instructions in z80asm. If this option is specified, undocumented instructions are written directly into the disassembly.
+.TP
+.B \-v, \-\-verbose
+Increase verbosity level.  Specify multiple times to be more verbose.  Messages are sent to standard error.
+.TP
+.B \-V, \-\-version
+Display version information and exit.
+.TP
+.B \-z, \-\-zilog
+Enable compatibility mode for the original Zilog Z80 assembler. This currently only changes the syntax of relative jumps.
+.TP
+.B \-1, \-\-z180
+Disassemble instructions supported by the Z180 processor.
+
+.SH SYMBOL FILE
+Symbol files written by 
+.B z80dasm 
+can be directly used as input symbol files with the 
+.B --sym-input
+option. The following directives are recognized in input symbol files and are propagated to the output symbol files:
+
+.TP
+.BR include " ""filename"""
+Include another symbol file. Double quotes are mandatory. Included files must be in the current directory.
+
+.TP
+.BR "" symbol: " equ" " value"
+Define a symbol with a value. The value is read in hexadecimal if it begins with 0x or 0X, in octal if it begins with 0, and in base 10 otherwise. Default is 0x0100. 
+
+.TP
+.BR ; " comment"
+All characters between a semi-colon and end of line are ignored.
+
+Lines beginning with a semi-colon immediately preceeding a symbol definition are considered to contain comments about the symbol. If
+.B --sym-comments
+option was used, such comments are copied to the disassembly and the output symbol file. There must be no white-space before the semi-colon or empty lines between the comment and symbol definition.
+
+.SH BLOCK FILE
+Block files specify the boundaries between different blocks (sections) of binary data in the disassembler input file. The following directives are recognized:
+
+.TP
+.BR "" name: " [ unlabeled ] [ start | first ] " "address" " [ unlabeled ] [ end | last ] " "address" " type" " type"
+Define a block with the start and end address that contains a certain type of binary data.
+
+Start address is the 16 bit address of the first byte in the block. Keywords "start" and "first" are synonymous. If the keyword "end" is used, the end address is the 16 bit address of the last byte in the block plus one. If the keyword "last" is used, the end address is the 16 bit address of the last byte in block.
+
+Normally labels are defined at the addresses specified in the block definition. This can be suppressed by adding the keyword "unlabeled" before the address.
+
+.TP
+.BR ; " comment"
+All characters between a semi-colon and end of line are ignored.
+
+.P
+The following block types are supported:
+
+.TP
+.B code
+Block containing Z80 machine code. Data in this block will be written in Z80 assembly language.
+
+.TP
+.B bytedata
+Data block containing separate bytes. Data in this block will be written with 
+.I defb
+directives.
+
+.TP
+.B worddata
+Data block containing 16 bit words (low order byte first). Data in this block will be written with 
+.I defw
+directives.
+
+.TP
+.B pointers
+Data block containing 16 bit pointers (low order byte first). This type is
+equivalent to 
+.B worddata
+except that values will be replaced with labels where that is possible.
+
+.SH DIAGNOSTICS
+If disassembly was successful 
+.B z80dasm
+returns 0. On error diagnostic messages are printed to standard error and
+.B z80dasm
+returns 1.
+
+.SH BUGS
+Please report bugs to 
+.I
+tomaz.solc@tablix.org
+.SH AUTHOR
+.B z80dasm 
+is based largely on
+.B dz80
+, written by Jan Panteltje. Feature enhancements and bug fixes were made by Tomaz Solc and other contributors (see NEWS file).
+.SH SEE ALSO
+.BR z80asm (1)

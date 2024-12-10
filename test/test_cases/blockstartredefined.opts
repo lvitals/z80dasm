@@ -1,0 +1,1 @@
+-S test_cases/blockstartredefined.sym -b test_cases/blockstartredefined.blocks
